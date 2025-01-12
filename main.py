@@ -1,3 +1,5 @@
+import os 
+
 def clear():
     subprocess.run("clear")
 
