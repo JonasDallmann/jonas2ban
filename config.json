@@ -1,6 +1,6 @@
 {
     "log_file": "/var/log/auth.log",
-    "ban_time": 3600,
+    "ban_time": 60,
     "max_retries": 1,
     "regex": "Failed password for .* from (\\d+\\.\\d+\\.\\d+\\.\\d+)",
     "action": "iptables -A INPUT -s {ip} -j DROP",
