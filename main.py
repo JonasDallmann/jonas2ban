@@ -24,15 +24,14 @@ def check_and_install_dependencies():
 def check_and_install_iptables():
     try:
         subprocess.run(["iptables", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} iptables ist installiert.")
     except FileNotFoundError:
-        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} iptables nicht gefunden. Versuche, es zu installieren...")
+        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} iptables not found. Installing...")
         install_iptables()
     except subprocess.CalledProcessError as e:
-        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Fehler bei der Überprüfung von iptables: {e}")
+        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error checking for iptables: {e}")
         install_iptables()
 
-        
+
 def install_iptables():
     try: 
         subprocess.run("apt update && apt upgrade -y", shell=True)
