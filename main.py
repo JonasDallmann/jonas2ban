@@ -22,11 +22,13 @@ def check_and_install_dependencies():
     except ImportError:
         print(f"[ERROR] colorama module not found. Installing...")
         subprocess.run("pip install colorama", shell=True)
+        from colorama import Fore, Style, init
     try:
         import requests
     except ImportError:
         print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} requests module not found. Installing...")
         subprocess.run("pip install requests", shell=True)
+        import requests
 
 
 def check_and_install_iptables():
