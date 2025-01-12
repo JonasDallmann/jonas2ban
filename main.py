@@ -1,9 +1,3 @@
-with open("config.json", "r") as f:
-    CONFIG = json.load(f)
-
-banned_ips = {}
-failed_attempts = {}
-
 def clear():
     subprocess.run("clear")
 
@@ -108,6 +102,12 @@ if __name__ == "__main__":
     from datetime import datetime, timedelta
     from threading import Thread
     import requests
+
+    with open("config.json", "r") as f:
+    CONFIG = json.load(f)
+
+    banned_ips = {}
+    failed_attempts = {}
 
 
     print(f"{Fore.GREEN}Welcome to Jonas2Ban{Style.RESET_ALL}")
