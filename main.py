@@ -1,4 +1,4 @@
-import os 
+import os
 
 def clear():
     subprocess.run("clear")
@@ -169,10 +169,6 @@ def send_to_discord(title, message, color):
     requests.post(CONFIG["discord_webhook"], json=data)
 
 if __name__ == "__main__":
-    if not os.getenv("INVOCATION_ID"):  # Systemd setzt diese Umgebungsvariable
-        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Dieses Skript sollte nur über den SystemD-Dienst gestartet werden!")
-        exit(1)
-
     check_and_install_dependencies()
     from colorama import Fore, Style, init
     init()
@@ -203,11 +199,5 @@ if __name__ == "__main__":
     print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Creating and enabling SystemD service")
     create_and_enable_systemd_service()
 
-    log_thread = Thread(target=monitor_logs)
-    unban_thread = Thread(target=unban_ips)
-    print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Starting Log Monitor")
-    log_thread.start()
-    print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Log Monitor started")
-    print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Starting Unban Monitor")
-    unban_thread.start()
-    print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Unban Monitor started")
+    print(f"{Fore.GREEN}[INFO]{Style.RESET_ALL} Script is running in the background now. Check status with systemctl status jonas2ban.service")
+    exit(0)
