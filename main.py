@@ -97,7 +97,6 @@ def send_to_discord(message):
     requests.post(CONFIG["discord_webhook"], json=data)
 
 if __name__ == "__main__":
-    clear()
     check_and_install_dependencies()
     from colorama import Fore, Style, init
     import re
@@ -107,6 +106,7 @@ if __name__ == "__main__":
     from datetime import datetime, timedelta
     from threading import Thread
     import requests
+    clear()
 
     with open("config.json", "r") as f:
         CONFIG = json.load(f)
