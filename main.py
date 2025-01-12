@@ -17,16 +17,16 @@ def clear():
 
 def check_and_install_dependencies():
     try:
+        from colorama import Fore, Style, init
+        init()
+    except ImportError:
+        print(f"[ERROR] colorama module not found. Installing...")
+        subprocess.run("pip install colorama", shell=True)
+    try:
         import requests
     except ImportError:
         print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} requests module not found. Installing...")
         subprocess.run("pip install requests", shell=True)
-    try:
-        from colorama import Fore, Style, init
-        init()
-    except ImportError:
-        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} colorama module not found. Installing...")
-        subprocess.run("pip install colorama", shell=True)
 
 
 def check_and_install_iptables():
