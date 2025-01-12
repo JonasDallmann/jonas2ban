@@ -5,7 +5,6 @@ def clear():
 def check_and_install_dependencies():
     try:
         import colorama
-        init()
     except ImportError:
         print(f"[ERROR] colorama module not found. Installing...")
         subprocess.run("pip install colorama", shell=True)
@@ -99,6 +98,7 @@ def send_to_discord(message):
 if __name__ == "__main__":
     check_and_install_dependencies()
     from colorama import Fore, Style, init
+    init()
     import re
     import time
     import subprocess
