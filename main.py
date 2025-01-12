@@ -167,6 +167,10 @@ def send_to_discord(title, message, color):
     requests.post(CONFIG["discord_webhook"], json=data)
 
 if __name__ == "__main__":
+    if not os.getenv("INVOCATION_ID"):  # Systemd setzt diese Umgebungsvariable
+        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Dieses Skript sollte nur über den SystemD-Dienst gestartet werden!")
+        exit(1)
+
     check_and_install_dependencies()
     from colorama import Fore, Style, init
     init()
@@ -185,34 +189,23 @@ if __name__ == "__main__":
     banned_ips = {}
     failed_attempts = {}
 
-
     print(f"{Fore.GREEN}Welcome to Jonas2Ban{Style.RESET_ALL}")
     print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Dependencies installed")
-    print(f"{Fore.GREEN}[TASK]{Style.RESET_ALL} Checking IPTABLES")
-    check_and_install_iptables()
+    print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Checking rsyslog")
     check_and_install_rsyslog()
-    print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} IPTABLES installed")
+    print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} rsyslog installed")
+    print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Checking IPTABLES")
+    check_and_install_iptables()
+    print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} IPTABLES installiert")
+
+    print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Creating and enabling SystemD service")
+    create_and_enable_systemd_service()
+
     log_thread = Thread(target=monitor_logs)
     unban_thread = Thread(target=unban_ips)
-    try:
-        create_and_enable_systemd_service()
-    except Exception as e:
-        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error creating systemd service: {e}")
-        exit(1)
-    try:
-        print(f"{Fore.GREEN}[TASK]{Style.RESET_ALL} Starting Log Monitor")
-        log_thread.start()
-        print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Log Monitor started")
-    except Exception as e:
-        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error starting Log Monitor: {e}")
-        exit(1)
-    try:
-        hostname = get_own_hostname()
-        hostip = get_own_ip()
-        print(f"{Fore.GREEN}[TASK]{Style.RESET_ALL} Starting Unban Monitor")
-        unban_thread.start()
-        send_to_discord("Jonas2Ban Started", "**Hostname:** " +hostname +"\n**Host-IP:** " +hostip +"\n\nTake a coffee and relax, while i take care of your server.", 5763719)
-        print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Unban Monitor started")
-    except Exception as e:
-        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error starting Unban Monitor: {e}")
-        exit(1)
+    print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Starting Log Monitor")
+    log_thread.start()
+    print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Log Monitor started")
+    print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Starting Unban Monitor")
+    unban_thread.start()
+    print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Unban Monitor started")
