@@ -31,6 +31,9 @@ def check_and_install_iptables():
         print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error checking for iptables: {e}")
         install_iptables()
 
+def get_formatted_time():
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 
 def install_iptables():
     try: 
@@ -78,14 +81,14 @@ def process_line(line):
         if ip in banned_ips:
             return
         failed_attempts[ip] = failed_attempts.get(ip, 0) + 1
-        print(f"[{datetime.now()}] Failed attempt #{failed_attempts[ip]} from {ip}")
+        print(f"[{get_formatted_time()}] Failed attempt #{failed_attempts[ip]} from {ip}")
 
         if failed_attempts[ip] >= CONFIG["max_retries"]:
             ban_ip(ip)
 
 def ban_ip(ip):
-    print(f"[{datetime.now()}] Banning {ip}")
-    send_to_discord(f"IP-Address: {ip}\nTime: {datetime.now()}\nASN: {get_asn(ip)}")
+    print(f"[{get_formatted_time}] Banning {ip}")
+    send_to_discord(f"**IP-Address:** {ip}\n**Time:** {get_formatted_time}\n**ASN:** {get_asn(ip)}")
     command = CONFIG["action"].format(ip=ip)
     subprocess.run(command, shell=True)
     banned_ips[ip] = datetime.now() + timedelta(seconds=CONFIG["ban_time"])
@@ -100,15 +103,16 @@ def unban_ips():
         time.sleep(10)
 
 def unban_ip(ip):
-    print(f"[{datetime.now()}] Unbanning {ip}")
+    print(f"[{get_formatted_time}] Unbanning {ip}")
     command = f"iptables -D INPUT -s {ip} -j DROP"
     subprocess.run(command, shell=True)
     del banned_ips[ip]
 
 def get_asn(ip):
-    command = f"whois {ip}"
-    output = subprocess.run(command, shell=True, capture_output=True)
-    return output.stdout.decode("utf-8")
+    r = requests.get(f"https://ipinfo.io/{ip}/json")
+    if r.status_code == 200:
+        return r.json().get("org", "Unknown")
+    return "Unknown"
 
 def send_to_discord(message):
     embed = {
@@ -141,21 +145,21 @@ if __name__ == "__main__":
 
     print(f"{Fore.GREEN}Welcome to Jonas2Ban{Style.RESET_ALL}")
     print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Dependencies installed")
-    print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Checking IPTABLES")
+    print(f"{Fore.GREEN}[TASK]{Style.RESET_ALL} Checking IPTABLES")
     check_and_install_iptables()
     check_and_install_rsyslog()
     print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} IPTABLES installed")
     log_thread = Thread(target=monitor_logs)
     unban_thread = Thread(target=unban_ips)
     try:
-        print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Starting Log Monitor")
+        print(f"{Fore.GREEN}[TASK]{Style.RESET_ALL} Starting Log Monitor")
         log_thread.start()
         print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Log Monitor started")
     except Exception as e:
         print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error starting Log Monitor: {e}")
         exit(1)
     try:
-        print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Starting Unban Monitor")
+        print(f"{Fore.GREEN}[TASK]{Style.RESET_ALL} Starting Unban Monitor")
         unban_thread.start()
         print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Unban Monitor started")
     except Exception as e:
