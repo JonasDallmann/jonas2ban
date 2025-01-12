@@ -15,6 +15,11 @@ def check_and_install_dependencies():
         print(f"[ERROR] requests module not found. Installing...")
         subprocess.run("pip install requests", shell=True)
         import requests
+    try:
+        import subprocess
+    except ImportError:
+        print(f"[ERROR] subprocess module not found. Installing...")
+        subprocess.run("pip install subprocess", shell=True)
 
 
 def check_and_install_iptables():
