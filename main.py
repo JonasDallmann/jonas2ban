@@ -109,6 +109,12 @@ def send_to_discord(message):
 if __name__ == "__main__":
     clear()
     print(f"{Fore.GREEN}Welcome to Jonas2Ban{Style.RESET_ALL}")
+    print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Checking dependencies")
+    check_and_install_dependencies()
+    print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Dependencies installed")
+    print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Checking IPTABLES")
+    check_and_install_iptables()
+    print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} IPTABLES installed")
     log_thread = Thread(target=monitor_logs)
     unban_thread = Thread(target=unban_ips)
     print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Starting Log Monitor")
