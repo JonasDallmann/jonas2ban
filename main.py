@@ -55,6 +55,7 @@ def install_rsyslog():
     try:
         subprocess.run("apt update && apt install -y rsyslog", shell=True, check=True)
         print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} rsyslog successfully installed")
+        time.sleep(10)
     except Exception as e:
         print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error installing rsyslog: {e}")
         exit(1)
