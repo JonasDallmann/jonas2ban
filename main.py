@@ -34,6 +34,11 @@ def check_and_install_iptables():
 def get_formatted_time():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+def get_own_hostname():
+    return subprocess.run("hostname", shell=True, stdout=subprocess.PIPE).stdout.decode().strip()
+
+def get_own_ip():
+    return subprocess.run("hostname -I", shell=True, stdout=subprocess.PIPE).stdout.decode().strip()
 
 def install_iptables():
     try: 
@@ -89,8 +94,10 @@ def process_line(line):
 
 def ban_ip(ip):
     formatted_time = get_formatted_time()
+    hostname = get_own_hostname()
+    hostip = get_own_ip()
     print(f"[{formatted_time}] Banning {ip}")
-    send_to_discord("SSH Brute Force Detected", f"**IP-Address:** {ip}\n**Time:** {formatted_time}\n**ASN:** {get_asn(ip)}", 15548997)
+    send_to_discord("SSH Brute Force Detected", f"Executing Host: {hostname}\nExecuting IP: {hostip}\n\n**IP-Address:** {ip}\n**Time:** {formatted_time}\n**ASN:** {get_asn(ip)}", 15548997)
     command = CONFIG["action"].format(ip=ip)
     subprocess.run(command, shell=True)
     banned_ips[ip] = datetime.now() + timedelta(seconds=CONFIG["ban_time"])
