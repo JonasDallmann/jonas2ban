@@ -33,44 +33,36 @@ def check_and_install_iptables():
 
 def create_and_enable_systemd_service():
     service_path = "/etc/systemd/system/jonas2ban.service"
+    script_path = "/opt/jonas2ban/main.py"
+    working_directory = "/opt/jonas2ban"
+
+    if subprocess.run(["systemctl", "is-enabled", "jonas2ban"], stdout=subprocess.PIPE, stderr=subprocess.PIPE).returncode == 0:
+        return
+
+    service_content = f"""
+[Unit]
+Description=Jonas2Ban Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 {script_path}
+Restart=always
+User=root
+Group=root
+WorkingDirectory={working_directory}
+
+[Install]
+WantedBy=multi-user.target
+    """
     try:
-        result = subprocess.run(
-            ["systemctl", "is-enabled", "jonas2ban"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
-        )
-        if result.returncode == 0:
-            print(f"{Fore.YELLOW}[INFO]{Style.RESET_ALL} SystemD-Dienst 'jonas2ban' ist bereits aktiviert.")
-            print(f"{Fore.GREEN}[INFO]{Style.RESET_ALL} Starte den Dienst...")
-            subprocess.run(["systemctl", "start", "jonas2ban"], check=True)
-            exit(0)
-
-        service_content = f"""
-        [Unit]
-        Description=Jonas2Ban Service
-        After=network.target
-
-        [Service]
-        ExecStart=/usr/bin/python3 /opt/jonas2ban/main.py
-        Restart=always
-        User=root
-        Group=root
-
-        [Install]
-        WantedBy=multi-user.target
-        """
-
         with open(service_path, "w") as service_file:
             service_file.write(service_content)
-
         subprocess.run(["systemctl", "daemon-reload"], check=True)
         subprocess.run(["systemctl", "enable", "jonas2ban"], check=True)
         subprocess.run(["systemctl", "start", "jonas2ban"], check=True)
-        print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Systemd service created and started.")
-        exit(0)
     except Exception as e:
         print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error creating systemd service: {e}")
-        exit(1)
+
 
 def get_formatted_time():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
