@@ -5,12 +5,48 @@ import json
 from datetime import datetime, timedelta
 from threading import Thread
 import requests
+from colorama import Fore, Style, init
 
 with open("config.json", "r") as f:
     CONFIG = json.load(f)
 
+init() 
+
 banned_ips = {}
 failed_attempts = {}
+
+def clear():
+    subprocess.run("clear")
+
+
+def check_and_install_dependencies():
+    try:
+        import requests
+    except ImportError:
+        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} requests module not found. Installing...")
+        subprocess.run("pip install requests", shell=True)
+    try:
+        import colorama
+    except ImportError:
+        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} colorama module not found. Installing...")
+        subprocess.run("pip install colorama", shell=True)
+
+
+def check_and_install_iptables():
+    try:
+        subprocess.run("iptables", "--version", check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except FileNotFoundError:
+        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} iptables not found. Installing IPTABLES...")
+        install_iptables()
+
+def install_iptables():
+    try: 
+        subprocess.run("apt update && apt upgrade -y", shell=True)
+        subprocess.run("apt-get install iptables", shell=True)
+        print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} IPTABLES installed")
+    except Exception as e:
+        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Failed to install IPTABLES: {e}")
+        exit(1)
 
 def monitor_logs():
     with open(CONFIG["log_file"], "r") as f:
@@ -27,7 +63,7 @@ def process_line(line):
     if match:
         ip = match.group(1)
         if ip in banned_ips:
-            return  # Bereits gebannt
+            return
         failed_attempts[ip] = failed_attempts.get(ip, 0) + 1
         print(f"[{datetime.now()}] Failed attempt #{failed_attempts[ip]} from {ip}")
 
@@ -71,8 +107,13 @@ def send_to_discord(message):
     requests.post(CONFIG["discord_webhook"], json=data)
 
 if __name__ == "__main__":
+    clear()
+    print(f"{Fore.GREEN}Welcome to Jonas2Ban{Style.RESET_ALL}")
     log_thread = Thread(target=monitor_logs)
     unban_thread = Thread(target=unban_ips)
-
+    print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Starting Log Monitor")
     log_thread.start()
+    print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Log Monitor started")
+    print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Starting Unban Monitor")
     unban_thread.start()
+    print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Unban Monitor started")
