@@ -164,7 +164,7 @@ if __name__ == "__main__":
     try:
         print(f"{Fore.GREEN}[TASK]{Style.RESET_ALL} Starting Unban Monitor")
         unban_thread.start()
-        send_to_discord("Jonas2Ban Started", "Jonas2Ban has been started successfully.\nTake a coofee and relax, while i take care of your server.", 5763719)
+        send_to_discord("Jonas2Ban Started", "Jonas2Ban has been started successfully.\nTake a coffee and relax, while i take care of your server.", 5763719)
         print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Unban Monitor started")
     except Exception as e:
         print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error starting Unban Monitor: {e}")
