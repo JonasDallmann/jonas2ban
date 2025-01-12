@@ -41,6 +41,25 @@ def install_iptables():
         print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Failed to install IPTABLES: {e}")
         exit(1)
 
+def check_and_install_rsyslog():
+    try:
+        subprocess.run(["rsyslogd", "-v"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except FileNotFoundError:
+        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} ryslog not found. Installing...")
+        install_rsyslog()
+    except subprocess.CalledProcessError as e:
+        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error checking for rsyslog: {e}")
+        install_rsyslog()
+
+def install_rsyslog():
+    try:
+        subprocess.run("apt update && apt install -y rsyslog", shell=True, check=True)
+        print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} rsyslog successfully installed")
+    except Exception as e:
+        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error installing rsyslog: {e}")
+        exit(1)
+
+
 def monitor_logs():
     with open(CONFIG["log_file"], "r") as f:
         f.seek(0, 2)
@@ -126,9 +145,17 @@ if __name__ == "__main__":
     print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} IPTABLES installed")
     log_thread = Thread(target=monitor_logs)
     unban_thread = Thread(target=unban_ips)
-    print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Starting Log Monitor")
-    log_thread.start()
-    print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Log Monitor started")
-    print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Starting Unban Monitor")
-    unban_thread.start()
-    print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Unban Monitor started")
+    try:
+        print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Starting Log Monitor")
+        log_thread.start()
+        print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Log Monitor started")
+    except Exception as e:
+        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error starting Log Monitor: {e}")
+        exit(1)
+    try:
+        print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Starting Unban Monitor")
+        unban_thread.start()
+        print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Unban Monitor started")
+    except Exception as e:
+        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error starting Unban Monitor: {e}")
+        exit(1)
