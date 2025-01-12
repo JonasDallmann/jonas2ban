@@ -1,10 +1,3 @@
-import re
-import time
-import subprocess
-import json
-from datetime import datetime, timedelta
-from threading import Thread
-
 with open("config.json", "r") as f:
     CONFIG = json.load(f)
 
@@ -17,16 +10,15 @@ def clear():
 
 def check_and_install_dependencies():
     try:
-        from colorama import Fore, Style, init
+        import colorama
         init()
     except ImportError:
         print(f"[ERROR] colorama module not found. Installing...")
         subprocess.run("pip install colorama", shell=True)
-        from colorama import Fore, Style, init
     try:
         import requests
     except ImportError:
-        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} requests module not found. Installing...")
+        print(f"[ERROR] requests module not found. Installing...")
         subprocess.run("pip install requests", shell=True)
         import requests
 
@@ -108,6 +100,16 @@ def send_to_discord(message):
 if __name__ == "__main__":
     clear()
     check_and_install_dependencies()
+    from colorama import Fore, Style, init
+    import re
+    import time
+    import subprocess
+    import json
+    from datetime import datetime, timedelta
+    from threading import Thread
+    import requests
+
+
     print(f"{Fore.GREEN}Welcome to Jonas2Ban{Style.RESET_ALL}")
     print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Dependencies installed")
     print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Checking IPTABLES")
