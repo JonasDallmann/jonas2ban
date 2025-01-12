@@ -104,7 +104,7 @@ if __name__ == "__main__":
     import requests
 
     with open("config.json", "r") as f:
-    CONFIG = json.load(f)
+        CONFIG = json.load(f)
 
     banned_ips = {}
     failed_attempts = {}
