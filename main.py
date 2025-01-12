@@ -33,7 +33,12 @@ def check_and_install_iptables():
 
 def create_and_enable_systemd_service():
     service_path = "/etc/systemd/system/jonas2ban.service"
-    if subprocess.run("systemctl", "is-enabled", "jonas2ban", stdout=subprocess.PIPE, stderr=subprocess.PIPE).returncode == 0:
+    result = subprocess.run(
+        ["systemctl", "is-enabled", "jonas2ban"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+    if result.returncode == 0:
         return
 
     service_content = f"""
