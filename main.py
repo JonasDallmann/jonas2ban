@@ -8,8 +8,6 @@ from threading import Thread
 with open("config.json", "r") as f:
     CONFIG = json.load(f)
 
-init() 
-
 banned_ips = {}
 failed_attempts = {}
 
@@ -25,6 +23,7 @@ def check_and_install_dependencies():
         subprocess.run("pip install requests", shell=True)
     try:
         from colorama import Fore, Style, init
+        init()
     except ImportError:
         print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} colorama module not found. Installing...")
         subprocess.run("pip install colorama", shell=True)
