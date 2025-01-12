@@ -142,6 +142,7 @@ if __name__ == "__main__":
     print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Dependencies installed")
     print(f"{Fore.GREEN}[+]{Style.RESET_ALL} Checking IPTABLES")
     check_and_install_iptables()
+    check_and_install_rsyslog()
     print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} IPTABLES installed")
     log_thread = Thread(target=monitor_logs)
     unban_thread = Thread(target=unban_ips)
