@@ -75,20 +75,22 @@ def monitor_logs():
             process_line(line)
 
 def process_line(line):
+    formatted_time = get_formatted_time()
     match = re.search(CONFIG["regex"], line)
     if match:
         ip = match.group(1)
         if ip in banned_ips:
             return
         failed_attempts[ip] = failed_attempts.get(ip, 0) + 1
-        print(f"[{get_formatted_time()}] Failed attempt #{failed_attempts[ip]} from {ip}")
+        print(f"[{formatted_time}] Failed attempt #{failed_attempts[ip]} from {ip}")
 
         if failed_attempts[ip] >= CONFIG["max_retries"]:
             ban_ip(ip)
 
 def ban_ip(ip):
-    print(f"[{get_formatted_time}] Banning {ip}")
-    send_to_discord(f"**IP-Address:** {ip}\n**Time:** {get_formatted_time}\n**ASN:** {get_asn(ip)}")
+    formatted_time = get_formatted_time()
+    print(f"[{formatted_time}] Banning {ip}")
+    send_to_discord(f"**IP-Address:** {ip}\n**Time:** {formatted_time}\n**ASN:** {get_asn(ip)}")
     command = CONFIG["action"].format(ip=ip)
     subprocess.run(command, shell=True)
     banned_ips[ip] = datetime.now() + timedelta(seconds=CONFIG["ban_time"])
@@ -103,7 +105,8 @@ def unban_ips():
         time.sleep(10)
 
 def unban_ip(ip):
-    print(f"[{get_formatted_time}] Unbanning {ip}")
+    formatted_time = get_formatted_time()
+    print(f"[{formatted_time}] Unbanning {ip}")
     command = f"iptables -D INPUT -s {ip} -j DROP"
     subprocess.run(command, shell=True)
     del banned_ips[ip]
@@ -116,7 +119,7 @@ def get_asn(ip):
 
 def send_to_discord(message):
     embed = {
-        "title": "[NEW DETECTION] SSH Brute Force Detected",
+        "title": "SSH Brute Force Detected",
         "description": message,
         "color": 16711680
     }
