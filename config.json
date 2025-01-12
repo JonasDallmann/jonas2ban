@@ -1,7 +1,7 @@
 {
     "log_file": "/var/log/auth.log",
     "ban_time": 3600,
-    "max_retries": 0,
+    "max_retries": 1,
     "regex": "Failed password for .* from (\\d+\\.\\d+\\.\\d+\\.\\d+)",
     "action": "iptables -A INPUT -s {ip} -j DROP",
     "discord_webhook": "https://discordapp.com/api/webhooks/1328092690008637510/yOKRm2nnffJ7sxMR4GIeVBqhIDaXebp0Pmy8jw7k86Yr1aiuLw5OrLUF0sXWiF2Y9c71"
