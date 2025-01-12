@@ -169,9 +169,11 @@ if __name__ == "__main__":
         print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error starting Log Monitor: {e}")
         exit(1)
     try:
+        hostname = get_own_hostname()
+        hostip = get_own_ip()
         print(f"{Fore.GREEN}[TASK]{Style.RESET_ALL} Starting Unban Monitor")
         unban_thread.start()
-        send_to_discord("Jonas2Ban Started", "Jonas2Ban has been started successfully.\nTake a coffee and relax, while i take care of your server.", 5763719)
+        send_to_discord(f"Jonas2Ban Started", "**Hostname:** {hostname}\n**Host-IP:** {hostip}\n\nTake a coffee and relax, while i take care of your server.", 5763719)
         print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Unban Monitor started")
     except Exception as e:
         print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error starting Unban Monitor: {e}")
