@@ -4,8 +4,6 @@ import subprocess
 import json
 from datetime import datetime, timedelta
 from threading import Thread
-import requests
-from colorama import Fore, Style, init
 
 with open("config.json", "r") as f:
     CONFIG = json.load(f)
@@ -26,7 +24,7 @@ def check_and_install_dependencies():
         print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} requests module not found. Installing...")
         subprocess.run("pip install requests", shell=True)
     try:
-        import colorama
+        from colorama import Fore, Style, init
     except ImportError:
         print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} colorama module not found. Installing...")
         subprocess.run("pip install colorama", shell=True)
