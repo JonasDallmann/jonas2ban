@@ -31,6 +31,36 @@ def check_and_install_iptables():
         print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error checking for iptables: {e}")
         install_iptables()
 
+def create_and_enable_systemd_service():
+    service_path = "/etc/systemd/system/jonas2ban.service"
+    if subprocess.run("systemctl", "is-enabled", "jonas2ban", stdout=subprocess.PIPE, stderr=subprocess.PIPE).returncode == 0:
+        return
+
+    service_content = f"""
+    [Unit]
+    Description=Jonas2Ban Service
+    After=network.target
+
+    [Service]
+    ExecStart=/usr/bin/python3 /opt/jonas2ban/main.py
+    Restart=always
+    User=root
+    Group=root
+
+    [Install]
+    WantedBy=multi-user.target
+    """
+
+    try:
+        with open(service_path, "w") as f:
+            f.write(service_content)
+        subprocess.run(["systemctl", "daemon-reload"], check=True)
+        subprocess.run(["systemctl", "enable", "jonas2ban"], check=True)
+        print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} Systemd service created and enabled")
+    except Exception as e:
+        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error creating systemd service: {e}")
+        exit(1)
+
 def get_formatted_time():
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -161,6 +191,11 @@ if __name__ == "__main__":
     print(f"{Fore.GREEN}[SUCCESS]{Style.RESET_ALL} IPTABLES installed")
     log_thread = Thread(target=monitor_logs)
     unban_thread = Thread(target=unban_ips)
+    try:
+        create_and_enable_systemd_service()
+    except Exception as e:
+        print(f"{Fore.RED}[ERROR]{Style.RESET_ALL} Error creating systemd service: {e}")
+        exit(1)
     try:
         print(f"{Fore.GREEN}[TASK]{Style.RESET_ALL} Starting Log Monitor")
         log_thread.start()
